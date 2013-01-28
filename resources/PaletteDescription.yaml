@@ -245,6 +245,11 @@ Palette:
             extension: null
             folder: true
             default: "C:\\Windriver\\workspace"
+          - !FileProperty
+            name: Python Project Directory
+            extension: null
+            folder: true
+            default: ""
           - !BooleanProperty
             name: Export Subsystems
             default: true

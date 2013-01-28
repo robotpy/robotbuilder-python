@@ -1,0 +1,125 @@
+## Key Python Files
+- !File
+  export: $project/robot.py
+  source: ${exporter-path}robot.py
+  update: None
+
+- !File
+  export: $project/upload.py
+  source: ${exporter-path}upload.py
+  update: None
+
+## Core files
+- !File
+  export: $project/core/__init__.py
+  source: ${exporter-path}core/__init__.py
+  update: None
+
+- !File
+  export: $project/core/robot.py
+  source: ${exporter-path}core/robot.py
+  update: Modify
+  modifications:
+    autonomous: ${exporter-path}core/robot-autonomous.py
+    constructors: ${exporter-path}core/robot-constructors.py
+
+- !File
+  export: $project/core/robot_map.py
+  source: ${exporter-path}core/robot_map.py
+  update: Modify
+  modifications:
+    constructors: ${exporter-path}core/robot_map-constructors.py
+
+- !File
+  export: $project/core/oi.py
+  source: ${exporter-path}core/oi.py
+  update: Modify
+  modifications:
+    constructors: ${exporter-path}core/oi-constructors.py
+    functions: ${exporter-path}core/oi-functions.py
+
+## Export Commands as files
+#if ($export-commands)
+- !File
+  export: $project/commands/__init__.py
+  source: ${exporter-path}commands/__init__.py
+  update: Overwrite
+
+#foreach ($command in $commands)
+#if ($command.base.name == "Command Group")
+- !File
+  export: $project/commands/#module($command.name).py
+  source: ${exporter-path}commands/CommandGroup.py
+  update: None
+  variables:
+    command-name: ${command.name}
+#elseif($command.base.name == "PID Command")
+- !File
+  export: $project/commands/#module($command.name).py
+  source: ${exporter-path}commands/PIDCommand.py
+  update: Modify
+  modifications:
+    pid: ${exporter-path}commands/PIDCommand-pid.py
+    requires: ${exporter-path}commands/Command-requires.py
+    source: ${exporter-path}commands/PIDCommand-source.py
+    output: ${exporter-path}commands/PIDCommand-output.py
+  variables:
+    command-name: ${command.name}
+#elseif($command.base.name == "Setpoint Command")
+- !File
+  export: $project/commands/#module($command.name).py
+  source: ${exporter-path}commands/SetpointCommand.py
+  update: Modify
+  modifications:
+    requires: ${exporter-path}commands/Command-requires.py
+    Initialize: ${exporter-path}commands/SetpointCommand-Initialize.py
+    IsFinished: ${exporter-path}commands/SetpointCommand-IsFinished.py
+  variables:
+    command-name: ${command.name}
+#else
+- !File
+  export: $project/commands/#module($command.name).py
+  source: ${exporter-path}commands/Command.py
+  update: Modify
+  modifications:
+    requires: ${exporter-path}commands/Command-requires.py
+  variables:
+    command-name: ${command.name}
+#end 
+#end 
+#end
+
+## Export Subsystems as files
+#if ($export-subsystems)
+- !File
+  export: $project/subsystems/__init__.py
+  source: ${exporter-path}subsystems/__init__.py
+  update: Overwrite
+
+#foreach ($subsystem in $subsystems)
+#if ($subsystem.base.name == "PID Subsystem")
+- !File
+  export: $project/subsystems/#module($subsystem.name).py
+  source: ${exporter-path}subsystems/PIDSubsystem.py
+  update: Modify
+  modifications:
+    declarations: ${exporter-path}subsystems/Subsystem-declarations.py
+    default_command: ${exporter-path}subsystems/Subsystem-default_command.py
+    pid: ${exporter-path}subsystems/PIDSubsystem-pid.py
+    source: ${exporter-path}subsystems/PIDSubsystem-source.py
+    output: ${exporter-path}subsystems/PIDSubsystem-output.py
+  variables:
+    subsystem-name: ${subsystem.name}
+#else
+- !File
+  export: $project/subsystems/#module($subsystem.name).py
+  source: ${exporter-path}subsystems/Subsystem.py
+  update: Modify
+  modifications:
+    declarations: ${exporter-path}subsystems/Subsystem-declarations.py
+    default_command: ${exporter-path}subsystems/Subsystem-default_command.py
+  variables:
+    subsystem-name: ${subsystem.name}
+#end
+#end
+#end
